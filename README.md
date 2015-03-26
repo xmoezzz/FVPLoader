@@ -1,10 +1,10 @@
-# FVPLoader (Gui ver 0.1, dev ver 0.3)
-A simple GUI Loader which allow you run FAVORITE's game under the none-Japanese OS
+# FVPLoader (Gui ver 0.1, dev ver 0.4)\n
+A simple GUI Loader which allow you run FAVORITE's game under the none-Japanese OS\n
 
---I wrote this tool about one year ago. Now I'm writing a GUI tool to make the process more easy.
---Make sure you put 'FVPLoaderGui.exe' and  'xmoe_fvp.dll' into you game directory.
+--I wrote this tool about one year ago. Now I'm writing a GUI tool to make the process more easy.\n
+--Make sure you put 'FVPLoaderGui.exe' and  'xmoe_fvp.dll' into you game directory.\n
 
---2 Ways to launch you game
+--2 Ways to launch your game
 --Drag FVP Engine into 'FVPLoaderGui.exe' then you can enjoy your game.
 --Open 'FVPLoaderGui.exe' and drag FVP Engine into FVPLoaderGui's window (recommended! Because I use shinku as background
 
