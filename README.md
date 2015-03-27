@@ -1,6 +1,6 @@
 # FVPLoader (Gui ver 0.1, dev ver 0.4)
 
-A simple GUI Loader which allow you run FAVORITE's game under the none-Japanese OS
+A simple GUI Loader which allow you to run FAVORITE's game under the none-Japanese OS
 
 
 --I wrote this tool about one year ago. Now I'm writing a GUI tool to make the process easier.
