@@ -1,4 +1,4 @@
-# FVPLoader (Gui ver 0.1, dev ver 0.4)
+# FVPLoader (Gui ver 0.5)
 
 A simple GUI Loader which allow you to run FAVORITE's game under the none-Japanese OS
 
@@ -25,3 +25,7 @@ A simple GUI Loader which allow you to run FAVORITE's game under the none-Japane
 --previous version(The console version :
 
 --http://bgm.tv/blog/53474   (In Chinese >_<
+
+直接叫ver0.5好了==
+
+对于F社第一个游戏标题栏乱码，因为不是什么比较的问题，所以暂时不做处理
