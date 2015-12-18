@@ -1,35 +1,30 @@
-# FVPLoader (Gui ver 0.6)
-
-A simple GUI Loader which allow you to run FAVORITE's game under the none-Japanese OS
+# FVPLoader (Gui ver 0.6)  
 
 
---I wrote this tool about one year ago. Now I'm writing a GUI tool to make the process easier.
+> A simple GUI Loader which allow you to run FAVORITE's game under the none-Japanese OS  
 
---Make sure you put 'FVPLoaderGui.exe' and  'xmoe_fvp.dll' into your game directory.
+## Notes
+- Make sure 'FVPLoaderGui.exe' and  'xmoe_fvp.dll' are in your game directory.  
 
---2 Ways to launch your game
+## How To Use
+Two Ways to launch your game：  
+**1.Drag FVP Engine into 'FVPLoaderGui.exe' then you can enjoy your game.**  
+(For example, drag 'WhiteEternity.exe' into 'FVPLoaderGui.exe'  --アストラエアの白き永遠  
 
---Drag FVP Engine into 'FVPLoaderGui.exe' then you can enjoy your game.
+**2.Open 'FVPLoaderGui.exe' and drag FVP Engine into FVPLoaderGui's window (recommend! Because I use shinku as background**  
+--After this process completed, the tool will automatically create a log file named 'FVPLog.ini'(Do not edit it!  
+--Next time when you want to play this game, run 'FVPLoaderGui.exe' directly and my tool will automatically launch your game  
 
-(For example, drag 'WhiteEternity.exe' into 'FVPLoaderGui.exe'  --アストラエアの白き永遠
-(drag 'World.exe' into 'FVPLoaderGui.exe' --いろとりどりのセカイ
+## Build
+- Microsoft Visual Studio 2013/2015
 
---Open 'FVPLoaderGui.exe' and drag FVP Engine into FVPLoaderGui's window (recommended! Because I use shinku as background
 
---After this process completed, the tool will automatically create a log file named 'FVPLog.ini'(Do not edit it!
+## Support
+xmoe.project@gmail.com  
+previous version(The console version :  
+http://bgm.tv/blog/53474   (In Chinese >_<  
 
---Next time when you want to play this game, run 'FVPLoaderGui.exe' directly and my tool will automatically launch your game
+## OpenSource License  
 
---xmoe.project@gmail.com
+All source code files in `FVPLoaderGui` and `xmoe_fvp` folders are licensed under [The MIT License (MIT)](http://mit-license.org).
 
---previous version(The console version :
-
---http://bgm.tv/blog/53474   (In Chinese >_<
-
-直接叫ver0.5好了==
-
-对于F社第一个游戏标题栏乱码，因为不是什么比较的问题，所以暂时不做处理
-
-↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-V0.6已经处理
