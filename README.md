@@ -1,30 +1,26 @@
-# FVPLoader (Gui ver 0.6)  
+# FVPLoader 
 
 
-> A simple GUI Loader which allow you to run FAVORITE's game under the none-Japanese OS  
+A simple GUI Loader which allow you to run FAVORITE's game under none-Japanese OS  
 
-## Notes
-- Make sure 'FVPLoaderGui.exe' and  'xmoe_fvp.dll' are in your game directory.  
+## How to use
+1. Copy both `FVPKernel.dll` and `FVPLoaderGui.exe` into the game directory.
+2. Double click `FVPLoaderGui.exe` and drag game executable file onto the window or just drag game executable file onto `FVPLoaderGui.exe`.
+3. `FVPLoaderGui.exe` will create a configuration file automatically. Next time you play game, just double click `FVPLoaderGui.exe`.
+4. Enjoy your game.
 
-## How To Use
-Two Ways to launch your game：  
-**1.Drag FVP Engine into 'FVPLoaderGui.exe' then you can enjoy your game.**  
-(For example, drag 'WhiteEternity.exe' into 'FVPLoaderGui.exe'  --アストラエアの白き永遠  
-
-**2.Open 'FVPLoaderGui.exe' and drag FVP Engine into FVPLoaderGui's window (recommend! Because I use shinku as background**  
---After this process completed, the tool will automatically create a log file named 'FVPLog.ini'(Do not edit it!  
---Next time when you want to play this game, run 'FVPLoaderGui.exe' directly and my tool will automatically launch your game  
 
 ## Build
 - Microsoft Visual Studio 2013/2015
 
 
-## Support
-xmoe.project@gmail.com  
-previous version(The console version :  
-http://bgm.tv/blog/53474   (In Chinese >_<  
+## 中文使用者可以直接看这一篇
+http://bgm.tv/blog/53474 
+>虽然这篇blog已经很早之前写的了。
 
 ## OpenSource License  
 
-All source code files in `FVPLoaderGui` and `xmoe_fvp` folders are licensed under [The MIT License (MIT)](http://mit-license.org).
+![Files](https://www.gnu.org/graphics/gplv3-127x51.png)
+
+All source code files in `source` folder are licensed under [GNU General Public License v3 (GPL v3)](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
