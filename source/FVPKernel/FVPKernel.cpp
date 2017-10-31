@@ -318,7 +318,6 @@ BOOL FASTCALL Initialize(HMODULE hModule)
 	FVPKernel->OriginalLocaleID = DefaultLocaleID;
 	FVPKernel->LocaleID = 0x411;
 
-	AllocConsole();
 	
 	FVPKernel->HookGdi32Routines(Nt_LoadLibrary(L"GDI32.DLL"));
 	
