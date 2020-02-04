@@ -4,9 +4,9 @@
 #include <shellapi.h>  
 #include "Resource.h"
 
-#pragma comment(linker, "/ENTRY:MainEntry")
-#pragma comment(lib, "shell32.lib")  
-#pragma comment(lib, "MyLibrary_x86.lib")  
+#pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "undoc_k32.lib")
+
 
 #define MAX_LOADSTRING 100
 
@@ -20,7 +20,7 @@ struct
 	BOOLEAN EnableFontHook;
 }static FVPLoader;
 
-LRESULT NTAPI WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);
 
 BOOL FASTCALL InitInstance(HINSTANCE hInstance)
 {
@@ -38,7 +38,7 @@ BOOL FASTCALL InitInstance(HINSTANCE hInstance)
    if (!hWnd)
 	   return FALSE;
 
-   SetWindowTextW(hWnd, L"FVPLoaderGui v0.7[X'moe]");
+   SetWindowTextW(hWnd, L"FVPLoaderGui v0.7-re[X'moe]");
    ShowWindow(hWnd, SW_SHOW);
    UpdateWindow(hWnd);
 
@@ -143,11 +143,11 @@ BOOL WriteLogFile(LPCWSTR ExePath, BOOLEAN bWindow, BOOLEAN bMessage, BOOLEAN bF
 		if (NT_FAILED(Status))
 			break;
 
-		Status = File.Write(LOG_SIG, StrLengthA(LOG_SIG));
+		Status = File.Write(LOG_SIG, strlen(LOG_SIG));
 		if (NT_FAILED(Status))
 			break;
 
-		Length = StrLengthW(ExePath);
+		Length = wcslen(ExePath);
 		Status = File.Write(&Length, sizeof(DWORD));
 		if (NT_FAILED(Status))
 			break;
@@ -282,7 +282,7 @@ FORCEINLINE BOOL CheckDll()
 {
 	DWORD  Attribute;
 
-	Attribute = Nt_GetFileAttributes(KERNEL_DLL);
+	Attribute = GetFileAttributesW(KERNEL_DLL);
 	return Attribute != 0xFFFFFFFF && (!(Attribute & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -301,7 +301,12 @@ BOOL FASTCALL CreateProcessInternalWithDll(LPCWSTR ProcessName)
 
 
 
-VOID CDECL MainEntry()
+int NTAPI wWinMain(
+	HINSTANCE hInstance,
+	HINSTANCE hPrevInstance,
+	LPWSTR     lpCmdLine,
+	int       nShowCmd
+)
 {
 	MSG          Message;
 	HACCEL       AccelTable;
@@ -313,15 +318,13 @@ VOID CDECL MainEntry()
 	WCHAR        ExeFullPath[MAX_PATH];
 	BOOLEAN      PatchWindow, PatchMessageBox, PatchFont;
 
-	ml::MlInitialize();
-
 	StubCreateProcessInternalW = (FuncCreateProcessInternalW)EATLookupRoutineByHashPNoFix(GetKernel32Handle(), KERNEL32_CreateProcessInternalW);
 
 	FVPLoader.EnableWindowHook     = FALSE;
 	FVPLoader.EnableMessageBoxHook = FALSE;
 	FVPLoader.EnableFontHook       = FALSE;
 	
-	Instance = (HINSTANCE)GetExeModuleHandle();
+	Instance = (HINSTANCE)GetModuleHandleW(nullptr);
 
 	LoadStringW(Instance, IDS_APP_TITLE, FVPLoader.Title, MAX_LOADSTRING);
 	LoadStringW(Instance, IDC_FVPLOADERGUI, FVPLoader.WindowClass, MAX_LOADSTRING);
@@ -348,7 +351,6 @@ VOID CDECL MainEntry()
 		if (Success)
 		{
 			ReleaseArgv(Argv);
-			ml::MlUnInitialize();
 			Ps::ExitProcess(0);
 		}
 		else
@@ -364,7 +366,6 @@ VOID CDECL MainEntry()
 		{
 			WriteLogFile(Argv[1], FALSE, FALSE, FALSE);
 			ReleaseArgv(Argv);
-			ml::MlUnInitialize();
 			Ps::ExitProcess(0);
 		}
 		else
@@ -377,7 +378,6 @@ VOID CDECL MainEntry()
 	if (!InitInstance (Instance))
 	{
 		ReleaseArgv(Argv);
-		ml::MlUnInitialize();
 		Ps::ExitProcess(0);
 	}
 
@@ -393,14 +393,13 @@ VOID CDECL MainEntry()
 	}
 
 	ReleaseArgv(Argv);
-	ml::MlUnInitialize();
-	Ps::ExitProcess(Message.wParam);
+	ExitProcess(Message.wParam);
 }
 
 
 
 
-Void FASTCALL DrawBmp(HDC hDC, HBITMAP Bitmap, ULONG nWidth, ULONG nHeight)
+VOID FASTCALL DrawBmp(HDC hDC, HBITMAP Bitmap, ULONG nWidth, ULONG nHeight)
 {
 	BITMAP        bm;
 	HDC           hdcImage;

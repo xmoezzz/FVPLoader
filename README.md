@@ -11,7 +11,8 @@ A simple GUI Loader which allow you to run FAVORITE's game under none-Japanese O
 
 
 ## Build
-- Microsoft Visual Studio 2013/2015
+- Microsoft Visual Studio 2017
+- Win10 SDK(19H2)
 
 
 ## 中文使用者可以直接看这一篇

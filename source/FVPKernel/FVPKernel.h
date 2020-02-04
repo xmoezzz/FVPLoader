@@ -2,7 +2,6 @@
 
 #include <my.h>
 
-
 typedef struct
 {
 	HDC                 DC;
@@ -34,43 +33,6 @@ typedef struct TEXT_METRIC_INTERNAL
 } TEXT_METRIC_INTERNAL, *PTEXT_METRIC_INTERNAL;
 
 
-#pragma warning(push)
-#pragma warning(disable:4324)
-
-typedef struct DECL_ALIGN(16) REGISTRY_ENTRY
-{
-	HKEY            Root;
-	ml::String      SubKey;
-	ml::String      ValueName;
-	ULONG_PTR       DataType;
-	PVOID           Data;
-	ULONG_PTR       DataSize;
-	ml::String      FullPath;
-
-	REGISTRY_ENTRY()
-	{
-		Data = nullptr;
-	}
-
-	~REGISTRY_ENTRY()
-	{
-		FreeMemoryP(this->Data);
-		this->Data = nullptr;
-	}
-
-private:
-	REGISTRY_ENTRY(const REGISTRY_ENTRY&);
-
-} REGISTRY_ENTRY, *PREGISTRY_ENTRY;
-
-#pragma warning(pop)
-
-typedef struct
-{
-	REGISTRY_ENTRY Original;
-	REGISTRY_ENTRY Redirected;
-
-} REGISTRY_REDIRECTION_ENTRY, *PREGISTRY_REDIRECTION_ENTRY;
 
 typedef struct HookKernel
 {
@@ -123,7 +85,36 @@ typedef struct HookKernel
 
 	HookKernel()
 	{
-		RtlZeroMemory(this, sizeof(HookKernel));
+		HookRoutineData.Gdi32.StockObjectInitialized = FALSE;
+		RtlZeroMemory(HookRoutineData.Gdi32.StockObject, 0, sizeof(HookRoutineData.Gdi32.StockObject));
+
+		HookStub.StubGetStockObject = nullptr;
+		HookStub.StubDeleteObject   = nullptr;
+		HookStub.StubCreateFontIndirectExW = nullptr;
+		HookStub.StubNtGdiHfontCreate = nullptr;
+		HookStub.StubCreateCompatibleDC = nullptr;
+		HookStub.StubEnumFontsA = nullptr;
+		HookStub.StubEnumFontsW = nullptr;
+		HookStub.StubEnumFontFamiliesA = nullptr;
+		HookStub.StubEnumFontFamiliesW = nullptr;
+		HookStub.StubEnumFontFamiliesExA = nullptr;
+		HookStub.StubEnumFontFamiliesExW = nullptr; 
+
+		StubGetVersionExA    = nullptr;
+		StubRegisterClassExA = nullptr;
+		StubCreateWindowExA  = nullptr;
+		StubDefWindowProcA   = nullptr;
+		StubDispatchMessageA = nullptr;
+
+		MainWindow = nullptr;
+		StubMainWindowProc = nullptr;
+
+		OriginalLocaleID = 0;
+		LocaleID = 0;
+		RtlZeroMemory(ScriptNameA, sizeof(ScriptNameA));
+		RtlZeroMemory(ScriptNameW, sizeof(ScriptNameW));
+		OriginalCharset = 0;
+
 	}
 
 
@@ -131,7 +122,6 @@ typedef struct HookKernel
 	NTSTATUS AdjustFontDataInternal(PADJUST_FONT_DATA AdjustData);
 	NTSTATUS GetNameRecordFromNameTable(PVOID TableBuffer, ULONG_PTR TableSize, ULONG_PTR NameID, ULONG_PTR LanguageID, PUNICODE_STRING Name);
 
-	VOID GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LOGFONTW *LogFont);
 	VOID GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LOGFONTW *LogFont);
 
 	PTEXT_METRIC_INTERNAL GetTextMetricFromCache(LPENUMLOGFONTEXW LogFont);

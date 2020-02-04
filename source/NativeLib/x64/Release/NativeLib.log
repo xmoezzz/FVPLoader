@@ -1,0 +1,2 @@
+﻿  my.cpp
+d:\simpleator\nativelib\phnt.h(44): fatal error C1083: Cannot open include file: 'phnt_ntdef.h': No such file or directory

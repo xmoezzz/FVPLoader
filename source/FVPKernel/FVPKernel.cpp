@@ -1,8 +1,7 @@
 #include <sdkddkver.h>
 #include "FVPKernel.h"
 
-#pragma comment(lib, "MyLibrary_x86.lib")
-#pragma comment(linker, "/ENTRY:DllEntryMain")
+#pragma comment(lib, "undoc_k32.lib")
 
 OVERLOAD_CPP_NEW_WITH_HEAP(Nt_CurrentPeb()->ProcessHeap);
 
@@ -43,13 +42,14 @@ ATOM WINAPI HookRegisterClassExA(CONST WNDCLASSEXA* lpWndClass)
 		return FVPKernel->StubRegisterClassExA(lpWndClass);
 
 	MenuName  = (LPWSTR)AllocStack((MenuLength + 1) * 2);
-	ClassName = (LPWSTR)AllocStack((ClassLength + 1)* 2);
+	ClassName = (LPWSTR)AllocStack((ClassLength + 1) * 2);
 
 	RtlZeroMemory(MenuName, (MenuLength + 1) * 2);
 	RtlZeroMemory(ClassName, (ClassLength + 1) * 2);
 
-	MultiByteToWideChar(932, 0, lpWndClass->lpszMenuName,  MenuLength,  MenuName, MAX_PATH);
+	MultiByteToWideChar(932, 0, lpWndClass->lpszMenuName, MenuLength, MenuName, MAX_PATH);
 	MultiByteToWideChar(932, 0, lpWndClass->lpszClassName, ClassLength, ClassName, MAX_PATH);
+
 
 	ClassInfo.cbSize        = sizeof(WNDCLASSEXW);
 	ClassInfo.style         = lpWndClass->style;
@@ -96,7 +96,6 @@ HWND WINAPI HookCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWi
 	WindowName = (LPWSTR)AllocStack(Length * sizeof(WCHAR));
 	RtlZeroMemory(WindowName, Length * sizeof(WCHAR));
 	MultiByteToWideChar(932, 0, lpWindowName, Length, WindowName, Length * sizeof(WCHAR));
-
 	FVPKernel->MainWindow = CreateWindowExW(dwExStyle, ClassName, WindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	return FVPKernel->MainWindow;
 }
@@ -105,18 +104,22 @@ HWND WINAPI HookCreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWi
 LRESULT CALLBACK HookDefWindowProcA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if (hWnd == FVPKernel->MainWindow && FVPKernel->MainWindow != NULL)
+	{
 		return DefWindowProcW(hWnd, Msg, wParam, lParam);
-	else
-		return FVPKernel->StubDefWindowProcA(hWnd, Msg, wParam, lParam);
+	}
+	
+	return FVPKernel->StubDefWindowProcA(hWnd, Msg, wParam, lParam);
 }
 
 
 LRESULT WINAPI HookDispatchMessageA(MSG *lpMsg)
 {
 	if (lpMsg->hwnd == FVPKernel->MainWindow && FVPKernel->MainWindow != NULL)
+	{
 		return DispatchMessageW(lpMsg);
-	else
-		return FVPKernel->StubDispatchMessageA(lpMsg);
+	}
+	
+	return FVPKernel->StubDispatchMessageA(lpMsg);
 }
 
 
@@ -133,7 +136,7 @@ BOOL WINAPI HookGetVersionExA(LPOSVERSIONINFOA lpVersionInfo)
 
 INT WINAPI HooklStrcmpiA(LPCSTR lpString1, LPCSTR lpString2)
 {
-	Int Result;
+	int Result;
 
 	Result = CompareStringA(0x411, 1, lpString1, -1, lpString2, -1);
 	return Result - 2;
@@ -180,21 +183,27 @@ BOOL WINAPI HookGetMenuItemInfoA(HMENU hMenu, UINT uItem, BOOL fByPosition, LPME
 	if (((miitmp.fMask & MIIM_TYPE) && miitmp.fType != 0) || (miitmp.fMask & MIIM_STRING) || miitmp.cch > 0)
 	{
 		cchtmp = miitmp.cch;
-		miitmp.dwTypeData = (LPWSTR)AllocateMemoryP((cchtmp + 1) * sizeof(WCHAR), HEAP_ZERO_MEMORY);
+		miitmp.dwTypeData = (LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (cchtmp + 1) * sizeof(WCHAR));
 	}
 
 	Success = GetMenuItemInfoW(hMenu, uItem, fByPosition, &miitmp);
 	if (Success)
+	{
 		RtlCopyMemory(lpmii, &miitmp, miitmp.cbSize);
+	}
 
 	if (cchtmp > 0)
 	{
 		ccBuffer = WideCharToMultiByte(932, 0, miitmp.dwTypeData, -1, lpmii->dwTypeData, lpmii->cch, NULL, NULL);
-		if (ccBuffer > 0) 
+		if (ccBuffer > 0)
+		{
 			lpmii->cch = ccBuffer - 1;
+		}
 
-		if (miitmp.dwTypeData) 
-			FreeMemoryP(miitmp.dwTypeData);
+		if (miitmp.dwTypeData)
+		{
+			HeapFree(GetProcessHeap(), 0, miitmp.dwTypeData);
+		}
 
 		lpmii->dwTypeData[cchtmp - 1] = NULL;
 	}
@@ -208,7 +217,7 @@ LPCWSTR FASTCALL MultiByteToWideCharInternal(LPCSTR lpString)
 	LPWSTR   UnicodeStr;
 
 	Size = StrLengthA(lpString);
-	UnicodeStr = (LPWSTR)AllocateMemoryP((Size + 1) << 1);
+	UnicodeStr = (LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (Size + 1) << 1);
 
 	if (UnicodeStr) 
 	{
@@ -233,7 +242,7 @@ BOOL WINAPI HookSetMenuItemInfoA(HMENU hMenu, UINT uItem, BOOL fByPosition, LPME
 	Success = SetMenuItemInfoW(hMenu, uItem, fByPosition, (LPMENUITEMINFOW)lpmii);
 	if (TypeDataA) 
 	{ 
-		FreeMemoryP((LPVOID)lpmii->dwTypeData);
+		HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, (LPVOID)lpmii->dwTypeData);
 		lpmii->dwTypeData = (LPSTR)TypeDataA;
 	}
 	return Success;
@@ -300,7 +309,6 @@ BOOL FASTCALL Initialize(HMODULE hModule)
 	LCID            DefaultLocaleID;
 	LARGE_INTEGER   DefaultCasingTableSize;
 
-
 	Status = ml::MlInitialize();
 	if (NT_FAILED(Status))
 		return FALSE;
@@ -347,21 +355,19 @@ BOOL FASTCALL Initialize(HMODULE hModule)
 	return NT_SUCCESS(Status);
 }
 
-BOOL FASTCALL UnInitialize(HMODULE hModule, BOOL ForceUnload = FALSE)
+BOOL FASTCALL UnInitialize(HMODULE hModule)
 {
-	return (!ForceUnload) & 1;
+	return TRUE;
 }
 
-BOOL NTAPI DllEntryMain(HMODULE hModule, DWORD Reason, LPVOID lpReserved)
+BOOL NTAPI DllMain(HMODULE hModule, DWORD Reason, LPVOID lpReserved)
 {
 	switch (Reason)
 	{
 	case DLL_PROCESS_ATTACH:
-		return Initialize(hModule) || UnInitialize(hModule, TRUE);
-
-	case DLL_PROCESS_DETACH:
-		return UnInitialize(hModule);
+		return Initialize(hModule);
 	}
+	
 	return TRUE;
 }
 

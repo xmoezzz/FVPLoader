@@ -3,18 +3,19 @@
 #define FMS_CALL_MAGIC TAG4('FMSC')
 #define GDI_HOOK_BYPASS TAG4('GHBP')
 
+
 struct FMS_CALL_CONTEXT : public TEB_ACTIVE_FRAME
 {
 	HDC hDC;
 
 	FMS_CALL_CONTEXT()
 	{
-		this->Context = FMS_CALL_MAGIC;
+		this->Flags = FMS_CALL_MAGIC;
 	}
 
 	static FMS_CALL_CONTEXT* Find()
 	{
-		return (FMS_CALL_CONTEXT *)FindThreadFrame(FMS_CALL_MAGIC);
+		return (FMS_CALL_CONTEXT *)Ps::FindThreadFrame(FMS_CALL_MAGIC);
 	}
 };
 

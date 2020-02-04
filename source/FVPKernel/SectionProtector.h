@@ -24,15 +24,14 @@
 
 #define PROTECT_SECTION_INLINE ForceInline
 
-ML_NAMESPACE_BEGIN(SectionProtectorTypes)
-
-enum
+namespace SectionProtectorTypes
 {
-	SharedLock,
-	ExclusiveLock,
+	enum
+	{
+		SharedLock,
+		ExclusiveLock,
+	};
 };
-
-ML_NAMESPACE_END_(SectionProtectorTypes);
 
 class SectionProtectorBase
 {

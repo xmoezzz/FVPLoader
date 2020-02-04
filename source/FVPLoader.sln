@@ -1,28 +1,55 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FVPLoaderGui", "FVPLoaderGui\FVPLoaderGui.vcxproj", "{7CE64EEE-9840-431D-8E4B-B507C05DAB89}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99} = {DAA25F59-2B60-422E-9AF6-BE56CF70DA99}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FVPKernel", "FVPKernel\FVPKernel.vcxproj", "{8F8E17C1-754B-4854-B48E-67AEE1D0977D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99} = {DAA25F59-2B60-422E-9AF6-BE56CF70DA99}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeLib", "NativeLib\NativeLib.vcxproj", "{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Debug|Win32.ActiveCfg = Release|Win32
 		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Debug|Win32.Build.0 = Release|Win32
+		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Debug|x64.ActiveCfg = Release|Win32
+		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Debug|x64.Build.0 = Release|Win32
 		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Release|Win32.ActiveCfg = Release|Win32
 		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Release|Win32.Build.0 = Release|Win32
-		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|Win32.Build.0 = Debug|Win32
+		{7CE64EEE-9840-431D-8E4B-B507C05DAB89}.Release|x64.ActiveCfg = Release|Win32
+		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|Win32.ActiveCfg = Release|Win32
+		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|Win32.Build.0 = Release|Win32
+		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|x64.ActiveCfg = Release|Win32
+		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Debug|x64.Build.0 = Release|Win32
 		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Release|Win32.ActiveCfg = Release|Win32
 		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Release|Win32.Build.0 = Release|Win32
+		{8F8E17C1-754B-4854-B48E-67AEE1D0977D}.Release|x64.ActiveCfg = Release|Win32
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Debug|Win32.Build.0 = Debug|Win32
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Debug|x64.ActiveCfg = Debug|x64
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Debug|x64.Build.0 = Debug|x64
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Release|Win32.ActiveCfg = Release|Win32
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Release|Win32.Build.0 = Release|Win32
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Release|x64.ActiveCfg = Release|x64
+		{DAA25F59-2B60-422E-9AF6-BE56CF70DA99}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {499B0139-AA96-42FF-8123-1382816CAC39}
 	EndGlobalSection
 EndGlobal

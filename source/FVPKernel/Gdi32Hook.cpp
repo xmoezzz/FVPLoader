@@ -68,7 +68,7 @@ BOOL IsSystemCall(PVOID Routine)
 	return HasMovEax & HasCall & HasRet;
 }
 
-PWSTR MByteToWChar(PCSTR AnsiString, ULONG_PTR Length = -1)
+PWSTR MByteToWChar(PSTR AnsiString, ULONG_PTR Length = -1)
 {
 	PWSTR Unicode;
 
@@ -92,7 +92,7 @@ VOID FreeString(PVOID String)
 	FreeMemoryP(String);
 }
 
-PSTR WCharToMByte(PCWSTR Unicode, ULONG_PTR Length)
+PSTR WCharToMByte(PWSTR Unicode, ULONG_PTR Length)
 {
 	PSTR AnsiString;
 
@@ -142,53 +142,47 @@ BOOL IsGdiHookBypassed()
 	return FindThreadFrame(GDI_HOOK_BYPASS) != nullptr;
 }
 
-HFONT CreateFontIndirectBypassA(CONST LOGFONTA *lplf)
-{
-	TEB_ACTIVE_FRAME Bypass(GDI_HOOK_BYPASS);
-	Bypass.Push();
 
-	return CreateFontIndirectA(lplf);
-}
+struct TEB_ACTIVE_FRAME_CXX : TEB_ACTIVE_FRAME
+{
+	BOOL NeedPop;
+
+	TEB_ACTIVE_FRAME_CXX(ULONG Context = 0)
+	{
+		NeedPop = FALSE;
+		this->Flags = Context;
+		this->Previous = nullptr;
+		this->Context = 0;
+	}
+
+	~TEB_ACTIVE_FRAME_CXX()
+	{
+		if (NeedPop)
+			Pop();
+	}
+
+	inline VOID Push()
+	{
+		NeedPop = TRUE;
+		RtlPushFrame(this);
+	}
+
+	inline VOID Pop()
+	{
+		NeedPop = FALSE;
+		RtlPopFrame(this);
+	}
+};
+
 
 HFONT CreateFontIndirectBypassW(CONST LOGFONTW *lplf)
 {
-	TEB_ACTIVE_FRAME Bypass(GDI_HOOK_BYPASS);
+	TEB_ACTIVE_FRAME_CXX Bypass(GDI_HOOK_BYPASS);
 	Bypass.Push();
 
 	return CreateFontIndirectW(lplf);
 }
 
-VOID HookKernel::GetTextMetricsAFromLogFont(PTEXTMETRICA TextMetricA, CONST LOGFONTW *LogFont)
-{
-	HDC     hDC;
-	HFONT   Font, OldFont;
-	ULONG   GraphicsMode;
-
-	hDC = this->CreateCompatibleDC(nullptr);
-	if (hDC == nullptr)
-		return;
-
-	GraphicsMode = SetGraphicsMode(hDC, GM_ADVANCED);
-
-	LOOP_ONCE
-	{
-		Font = CreateFontIndirectBypassW(LogFont);
-		if (Font == nullptr)
-			break;
-
-		OldFont = (HFONT)SelectObject(hDC, Font);
-		if (OldFont != nullptr)
-		{
-			TextMetricA->tmCharSet = 0x80;
-			GetTextMetricsA(hDC, TextMetricA);
-		}
-
-		SelectObject(hDC, OldFont);
-		DeleteObject(Font);
-	}
-
-	DeleteDC(hDC);
-}
 
 VOID HookKernel::GetTextMetricsWFromLogFont(PTEXTMETRICW TextMetricW, CONST LOGFONTW *LogFont)
 {
@@ -223,7 +217,7 @@ PTEXT_METRIC_INTERNAL HookKernel::GetTextMetricFromCache(LPENUMLOGFONTEXW LogFon
 {
 	WCHAR buf[LF_FULLFACESIZE * 2];
 
-	StringUpperW(buf, FormatStringW(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet));
+	StringUpperW(buf, wsprintfW(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet));
 	return this->TextMetricCache.Get((PCWSTR)buf);
 }
 
@@ -231,7 +225,7 @@ VOID HookKernel::AddTextMetricToCache(LPENUMLOGFONTEXW LogFont, PTEXT_METRIC_INT
 {
 	WCHAR buf[LF_FULLFACESIZE * 2];
 
-	StringUpperW(buf, FormatStringW(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet));
+	StringUpperW(buf, wsprintfW(buf, L"%s@%d", LogFont->elfFullName, LogFont->elfLogFont.lfCharSet));
 	this->TextMetricCache.Add((PCWSTR)buf, *TextMetric);
 }
 
@@ -387,7 +381,7 @@ PUNICODE_STRING Name
 	FaceName = (PWSTR)PtrAdd(TableBuffer, Offset);
 
 	Buffer = Name->Buffer;
-	Length = (USHORT)ML_MIN(Length, Name->MaximumLength);
+	Length = (USHORT)min(Length, Name->MaximumLength);
 	Name->Length = Length;
 
 	for (ULONG_PTR Index = 0; Index != Length / sizeof(WCHAR); ++Index)
@@ -466,12 +460,12 @@ NTSTATUS HookKernel::AdjustFontDataInternal(PADJUST_FONT_DATA AdjustData)
 		Vertical = AdjustData->EnumLogFontEx->elfLogFont.lfFaceName[0] == '@';
 
 		Buffer = AdjustData->EnumLogFontEx->elfLogFont.lfFaceName + Vertical;
-		Length = ML_MIN(sizeof(AdjustData->EnumLogFontEx->elfLogFont.lfFaceName) - Vertical, FaceName.Length);
+		Length = min(sizeof(AdjustData->EnumLogFontEx->elfLogFont.lfFaceName) - Vertical, FaceName.Length);
 		CopyMemory(Buffer, FaceName.Buffer, Length);
 		*PtrAdd(Buffer, Length) = 0;
 
 		Buffer = AdjustData->EnumLogFontEx->elfFullName + Vertical;
-		Length = ML_MIN(sizeof(AdjustData->EnumLogFontEx->elfFullName) - Vertical, FullName.Length);
+		Length = min(sizeof(AdjustData->EnumLogFontEx->elfFullName) - Vertical, FullName.Length);
 		CopyMemory(Buffer, FullName.Buffer, Length);
 		*PtrAdd(Buffer, Length) = 0;
 	}
@@ -557,7 +551,7 @@ VOID ConvertUnicodeTextMetricToAnsi(PTEXTMETRICA TextMetricA, CONST TEXTMETRICW 
 	TextMetricA->tmDigitizedAspectY = TextMetricW->tmDigitizedAspectY;
 
 	TextMetricA->tmFirstChar = TextMetricW->tmStruckOut;
-	TextMetricA->tmLastChar = ML_MIN(0xFF, TextMetricW->tmLastChar);
+	TextMetricA->tmLastChar = min(0xFF, TextMetricW->tmLastChar);
 	TextMetricA->tmDefaultChar = TextMetricW->tmDefaultChar;
 	TextMetricA->tmBreakChar = TextMetricW->tmBreakChar;
 
@@ -730,7 +724,7 @@ int NTAPI LeEnumFontFamiliesW(HDC hdc, PCWSTR lpszFamily, FONTENUMPROCW lpProc, 
 	return GlobalData->EnumFontFamiliesW(hdc, lpszFamily, LeEnumFontCallbackW, (LPARAM)&Param);
 }
 
-int NTAPI LeEnumFontFamiliesA(HDC hdc, PCSTR lpszFamily, FONTENUMPROCA lpProc, LPARAM lParam)
+int NTAPI LeEnumFontFamiliesA(HDC hdc, PSTR lpszFamily, FONTENUMPROCA lpProc, LPARAM lParam)
 {
 	INT                 Result;
 	PWSTR               Family;
@@ -777,7 +771,7 @@ int NTAPI LeEnumFontsW(HDC hdc, PCWSTR lpFaceName, FONTENUMPROCW lpProc, LPARAM 
 	return GlobalData->EnumFontsW(hdc, lpFaceName, LeEnumFontCallbackW, (LPARAM)&Param);
 }
 
-int NTAPI LeEnumFontsA(HDC hdc, PCSTR lpFaceName, FONTENUMPROCA lpProc, LPARAM lParam)
+int NTAPI LeEnumFontsA(HDC hdc, PSTR lpFaceName, FONTENUMPROCA lpProc, LPARAM lParam)
 {
 	INT                 Result;
 	PWSTR               FaceName;
@@ -924,7 +918,7 @@ NTSTATUS HookKernel::HookGdi32Routines(PVOID Gdi32)
 {
 	PVOID NtGdiHfontCreate, Fms;
 
-	*(PVOID *)&GdiGetCodePage = GetRoutineAddress(Gdi32, "GdiGetCodePage");
+	*(PVOID *)&GdiGetCodePage = GetProcAddress((HMODULE)Gdi32, "GdiGetCodePage");
 
 	NtGdiHfontCreate = FindNtGdiHfontCreate(Gdi32);
 	if (NtGdiHfontCreate == nullptr)
@@ -948,7 +942,7 @@ NTSTATUS HookKernel::HookGdi32Routines(PVOID Gdi32)
 		LeHookFromEAT(Gdi32, GDI32, EnumFontFamiliesExA),
 		LeHookFromEAT(Gdi32, GDI32, EnumFontFamiliesExW),
 
-		LeFunctionJump(NtGdiHfontCreate),
+		//LeFunctionJump(NtGdiHfontCreate),
 	};
 
 	return Mp::PatchMemory(p, countof(p));
